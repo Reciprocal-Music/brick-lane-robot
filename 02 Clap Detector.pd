@@ -1,0 +1,164 @@
+#N canvas 0 23 1280 755 10;
+#X obj 84 20 loadbang;
+#X obj 30 118 snapshot~;
+#X obj 110 118 snapshot~;
+#X obj 84 39 metro 1;
+#X obj 188 76 adc~ 3 4 5;
+#X obj 190 118 snapshot~;
+#X obj 15 257 abs;
+#X obj 15 212 -;
+#X obj 121 574 + 1;
+#X msg 111 525 1;
+#X obj 96 646 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+-1;
+#X obj 93 258 abs;
+#X obj 93 212 -;
+#X obj 171 258 abs;
+#X obj 171 212 -;
+#X obj 78 405 +;
+#X obj 156 405 +;
+#X obj 96 441 > 1;
+#X obj 96 468 select 1;
+#X obj 171 163 pipe 10;
+#X obj 93 163 pipe 10;
+#X obj 15 163 pipe 10;
+#X obj 187 306 loadbang;
+#X obj 15 366 >;
+#X obj 93 366 >;
+#X obj 171 366 >;
+#X obj 96 574 int;
+#X obj 96 664 s clap;
+#X msg 243 306 0.2;
+#X obj 111 501 del 250;
+#X obj 96 621 sel 1;
+#X text 703 19 This module determines whether a clap has occured \,
+and outputs a 'trigger' used by other modules.;
+#X text 217 203 Calculates the difference between the current value
+and the delayed (earlier) value \, thereby seeing what 'distance' has
+been travelled in that time;
+#X text 215 256 Ensures that the difference is always expressed as
+a positive number;
+#X text 205 407 Adds the 3 evaluations (1s or 0s) together;
+#X text 143 440 Tests whether the number received is greater than 1
+;
+#X text 164 469 Only sends a bang if it receives a '1';
+#X text 155 568 Until this '1' is received (a sort of 'go-ahead') \,
+the float will output numbers higher than 1;
+#X text 140 622 The 'select' object only bangs if it receives a 1;
+#X text 147 39 Outputs a bang once each millesecond;
+#X text 268 75 Receives signals from the three accelerometer axes;
+#X text 265 113 Converts accelerometer signals to discrete numbers
+\, each time a bang is received;
+#X text 144 665 Sends out the trigger \, to be used by the other modules
+;
+#X text 1148 645 argument 1 (time window): 0.01 seconds (10ms) \; argument
+2 (threshold): < 0.45 \; argument 3 (debounce time): >0.25 seconds
+(>250ms);
+#X text 236 158 ARGUMENT 1 (time window) - Delays the data coming through
+it by the number of milliseconds specified;
+#X text 211 357 ARGUMENT 2 (threshold) - Checks whether the difference
+(or in other words \, the distance travelled in the specified time)
+is greater than a certain value;
+#X text 172 499 ARGUMENT 3 (debounce time) - This system will only
+reset the float with a '1' after the amount of time specified by the
+'delay' object has elapsed. This prevents multiple bangs resulting
+from just one clap.;
+#X text 673 64 It was created through a careful analysis of waveforms
+from the accelerometer.;
+#X text 721 109 This analysis helped determine the factors that distinguished
+a clap apart from any other movement.;
+#X text 1094 232 This will prevent multiple triggers resulting from
+a single clap.;
+#X text 1094 165 If the test is passed \, then the module will send
+out a trigger \, and stop accepting evaluations for a pretermined amount
+of 'debounce' time (argument 3) \, before allowing new triggers to
+pass through.;
+#X text 745 194 These were the unique characteristics of claps:;
+#X text 1209 19 So \, here is the basic rule I arrived at:;
+#X text 1100 120 To be extra safe \, this has to happen on more than
+one axis (2-out-of-3 rule).;
+#X text 1095 53 If \, over a predetermined period of time (argument
+1) the value being read on any axis changes by a sufficient amount
+(argument 2) \, whether positively or negatively \, then it's probably
+a clap.;
+#X text 703 273 - This impulse is usually made up of 2 or more spikes.
+;
+#X text 667 475 - A clap's spikes also occur more quickly than in any
+other movement. Although sharp changes may also occur in the waveforms
+displayed by a heavy shake or jolt \, the shortest time recorded between
+their high and low points was 70ms. On the other hand \, the longest
+time between the top and bottom of any sampled clap's spike was 22ms
+\, with the average time being 17ms.;
+#X text 685 228 - There is a sharp impulse in the waveforms of at least
+2 out of the 3 axes.;
+#X text 667 374 - Although other movements might see multiple axes
+covering a wide range (with 2 out of 3 axes covering a range of at
+least 0.75) \, have axes whose waveforms run parallel to each other
+(especially with shakes and wobbles) \, and may also have impulses
+\, it is rare that any other movement would exhibit sharp impulses
+exactly coinciding with each other on multiple axes \, as with a clap.
+;
+#X text 1100 277 To also avoid a potential bug \, the time window must
+err towards being shorter. If it were to err towards being longer \,
+it might not catch the very rapid change between values \, and instead
+\, the biggest range it will detect will be between the extremes and
+the centre line.;
+#X text 1100 431 - set the time window just below the shortest average
+time between the top and bottom of a spike (0.010 seconds);
+#X text 667 307 - These spikes cover a wide range. Out of a total range
+of 0-1 available to each axis \, the smallest average range traversed
+by spikes from at least 2 out of 3 axes during any clap sampled was
+0.45.;
+#X text 1094 566 - set the debounce time comfortably beyond the longest
+time for a clap impulse (0.25 seconds);
+#X text 1124 521 - gradually tweak this threshold downwards until it
+is responsive enough;
+#X text 1112 476 - being by setting the threshold just below the smallest
+average range covered by a spike (0.45);
+#X text 1154 611 And in summary \, these were the default arguments:
+;
+#X text 282 305 <-- threshold (keep below 0.45 \, 0.2 has been effective)
+;
+#X text 1106 386 So \, in conclusion \, this is how I determined the
+value for each argument:;
+#X connect 0 0 3 0;
+#X connect 1 0 21 0;
+#X connect 1 0 7 1;
+#X connect 2 0 20 0;
+#X connect 2 0 12 1;
+#X connect 3 0 1 0;
+#X connect 3 0 2 0;
+#X connect 3 0 5 0;
+#X connect 4 0 1 0;
+#X connect 4 1 2 0;
+#X connect 4 2 5 0;
+#X connect 5 0 19 0;
+#X connect 5 0 14 1;
+#X connect 6 0 23 0;
+#X connect 7 0 6 0;
+#X connect 8 0 26 1;
+#X connect 9 0 26 1;
+#X connect 10 0 27 0;
+#X connect 11 0 24 0;
+#X connect 12 0 11 0;
+#X connect 13 0 25 0;
+#X connect 14 0 13 0;
+#X connect 15 0 16 0;
+#X connect 16 0 17 0;
+#X connect 17 0 18 0;
+#X connect 18 0 26 0;
+#X connect 18 0 29 0;
+#X connect 19 0 14 0;
+#X connect 20 0 12 0;
+#X connect 21 0 7 0;
+#X connect 22 0 28 0;
+#X connect 23 0 15 0;
+#X connect 24 0 15 1;
+#X connect 25 0 16 1;
+#X connect 26 0 8 0;
+#X connect 26 0 30 0;
+#X connect 28 0 23 1;
+#X connect 28 0 24 1;
+#X connect 28 0 25 1;
+#X connect 29 0 9 0;
+#X connect 30 0 10 0;

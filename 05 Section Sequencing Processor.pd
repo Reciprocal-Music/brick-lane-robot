@@ -1,0 +1,60 @@
+#N canvas 0 23 937 669 10;
+#X obj 27 147 list prepend;
+#X msg 95 128 1;
+#X obj 27 88 r sectionSeqList;
+#X obj 27 197 s sectionSequence;
+#X obj 182 410 list length;
+#X obj 27 432 mod \$1;
+#X obj 27 410 f;
+#X obj 52 410 + 1;
+#X obj 27 482 + 1;
+#X obj 27 360 r sectionChange;
+#X obj 77 410 r sectionSeqList;
+#X obj 27 534 tabread sectionSequence;
+#X obj 39 128 r init1;
+#X obj 125 361 r init3;
+#X obj 27 582 s sectionInitialiser;
+#X text 22 9 Section table mapper;
+#X text 24 254 Section trigger distributor;
+#X text 571 67 It works in conjunction with the 'section manager' \,
+'set sequence' \, and 'chord sequencing processor' to send the appropriate
+trigger to the appropriate section.;
+#X text 138 88 <-- takes in the sequence message;
+#X text 138 124 <-- adds the index number '1' to the beginning of the
+message \, letting the table know where to start the list. the table
+will fill up the containers from 1 upwards with the values in the message.
+;
+#X text 143 197 <-- places the message into the table.;
+#X text 25 286 This module takes in 'section change' messages as input
+\, and outputs a counter that goes up to the length of the sequence
+chosen above. When it's counted up to the top \, it wraps back around
+to 1;
+#X text 184 361 <-- initialises the patch so it automatically starts
+on the first song.;
+#X text 266 408 <-- sets the counter to the length of the section sequence
+\, so it can loop around. This means you can take in section sequences
+of any length \, just by changing the message up at the top.;
+#X text 58 479 <-- this is so you can refer to sections in the sequence
+starting from 1 \, instead of 0 This feels a bit more natural.;
+#X text 179 533 <-- takes in the counter \, and outputs the value located
+at that index number;
+#X text 162 582 <-- outputs the result \, which is used by the 'section
+manager' module;
+#X text 589 22 This module handles the processing of the sequence of
+sections in the set.;
+#X text 23 38 This module takes the section sequence from the 'set
+sequence' module \, and maps it to the sectionSequence table.;
+#X connect 0 0 3 0;
+#X connect 1 0 0 1;
+#X connect 2 0 0 0;
+#X connect 4 0 5 1;
+#X connect 5 0 8 0;
+#X connect 6 0 7 0;
+#X connect 6 0 5 0;
+#X connect 7 0 6 1;
+#X connect 8 0 11 0;
+#X connect 9 0 6 0;
+#X connect 10 0 4 0;
+#X connect 11 0 14 0;
+#X connect 12 0 1 0;
+#X connect 13 0 6 0;
